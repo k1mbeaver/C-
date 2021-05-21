@@ -1,14 +1,17 @@
 #pragma once
-#include "SingleTon.h"
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <stdio.h>
+#define SIZE 100
+#define F_SIZE 210
+using namespace std;
 
-class Book {
-public:
-	Book* next = nullptr;
-
-	char chInformation[F_SIZE] = "\0";
+class BookSystem {
 	int nButton = 0;
 
 	int menu();
+	void Process();
 	void error();
 	void NoBook();
 	void CompleteDelete();
