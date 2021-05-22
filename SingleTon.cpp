@@ -65,3 +65,4 @@ SingletonClass* SingletonClass::gethead() {
 	}
 	return head;
 }
+

@@ -7,7 +7,9 @@
 #define F_SIZE 210
 using namespace std;
 
+
 class BookSystem {
+public:
 	int nButton = 0;
 
 	int menu();
@@ -21,5 +23,6 @@ class BookSystem {
 	void GetYear();
 	void GetInformation();
 	void HowInitialize();
-	void InitializeComplete();
+	void saveComplete();
+	void Information();
 };

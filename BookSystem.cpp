@@ -1,5 +1,5 @@
-#include "SIngleTon.h"
 #include "Booksystem.h"
+#include "FileClass.h"
 
 //start
 void BookSystem::GetName()
@@ -45,13 +45,13 @@ int BookSystem::menu()
 	cout << "=====================================================================================================================" << endl;
 	cout << "\t\t\t\t\t\t3. 도서 삭제하기" << endl;
 	cout << "=====================================================================================================================" << endl;
-	cout << "\t\t\t\t\t\t4. 도서 정보 검색" << endl;
+	cout << "\t\t\t\t\t\t4. 도서 정보 검색하기" << endl;
 	cout << "=====================================================================================================================" << endl;
-	cout << "\t\t\t\t\t\t5. 도서 목록 초기화" << endl;
+	cout << "\t\t\t\t\t\t5. 도서 목록 저장하기" << endl;
 	cout << "=====================================================================================================================" << endl;
-	cout << "\t\t\t\t\t\t6. 종료" << endl;
+	cout << "\t\t\t\t\t\t6. 저장 및 종료" << endl;
 	cout << "=====================================================================================================================" << endl;
-	cout << "사용할 기능의 번호를 입력하고 Enter를 눌러 주세요(6번을 누르거나 다른것을 누를시 프로그램이 종료됩니다.) : ";
+	cout << "사용할 기능의 번호를 입력하고 Enter를 눌러 주세요(7번을 누르거나 다른것을 누를시 프로그램이 종료됩니다.) : ";
 	cin >> nButton;
 
 	if (nButton >= 1 && nButton <= 6)
@@ -66,23 +66,31 @@ int BookSystem::menu()
 
 void BookSystem::Process()
 {
+	File myfile;
 	while (1)
 	{
 		switch (menu())
 		{
 		case 1:
+			myfile.printallindex();
 			break;
 		case 2:
+			myfile.insertbook();
 			break;
 		case 3:
+			myfile.deletebook();
 			break;
 		case 4:
+			myfile.searchbook();
 			break;
 		case 5:
+			myfile.savefile();
 			break;
 		case 6:
+			myfile.savefile();
 			return;
 		default:
+			myfile.savefile();
 			return;
 		}
 
@@ -90,6 +98,10 @@ void BookSystem::Process()
 }
 
 //end
+void BookSystem::Information()
+{
+	cout << endl << "\t\t\t\t\t 제목     /     작가     /     출판년도" << endl << endl;
+}
 void BookSystem::error()
 {
 	cout << endl << "\t\t\t\t\t== 다시 시도하여주세요 ==" << endl;
@@ -114,8 +126,8 @@ void BookSystem::CompleteInsert()
 	system("pause");
 }
 
-void BookSystem::InitializeComplete()
+void BookSystem::saveComplete()
 {
-	cout << "\t\t\t\t\t== 초기화가 완료 되었습니다!! ==" << endl;
+	cout << "\t\t\t\t\t== 저장이 완료 되었습니다!! ==" << endl;
 	system("pause");
 }

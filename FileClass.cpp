@@ -1,8 +1,7 @@
 #include "FileClass.h"
-#include "SingleTon.h"
 
 //LinkedList
-
+/*
 void File::returnNode()
 {
 	newNode = Head->next; //맨 처음노드부터 시작
@@ -28,32 +27,34 @@ void File::linkedlistTofile(FILE* Filetxt)
 
 	fclose(Filetxt);
 }
-
+*/
 //filemenu
 void File::printallindex()
 {
+	system("cls");
 	int naCount = 0;
-
+	SingletonClass* testhead = SingletonClass::gethead();
+	SingletonClass* newNode = NULL;
+	SingletonClass* Tail = NULL;
 	//출력하기
 	int GetnCount = 1;
 
 	if (testhead->next == NULL)
 	{
-		cout << endl << "\t\t\t\t\t== 현재 대출한 책이 없습니다. ==" << endl << endl;
+		Help.NoBook();
 	}
 	else
 	{
-		File* newNode = NULL;
 		newNode = testhead->next;
-		cout << endl << "\t\t\t\t\t 제목     /     작가     /     출판년도" << endl << endl;
-		while (GetnCount <= naCount)
+		Help.Information();
+		while (newNode != NULL)
 		{
 			cout << "<" << GetnCount << ">" << " " << newNode->chInformation << endl << endl;
 			newNode = newNode->next;
 			GetnCount++;
 		}
+		system("pause");
 	}
-	system("pause");
 }
 
 void File::insertbook()
@@ -61,23 +62,22 @@ void File::insertbook()
 	char chInformationBuffer[F_SIZE] = "\0";
 	int nReturnIndex = 0;
 	//연결리스트 만들기
-	nReturnIndex = makeLinkedList(Head, Filetxt);
-
+	SingletonClass* testhead = SingletonClass::gethead();
 	//정보 입력
-	Help->GetName();
+	Help.GetName();
 	getchar();
 	cin.getline(chFName, SIZE, '\n');
 
 	//오류
-	if (chFName[0] == ' ') { Help->error(); return; }
+	if (chFName[0] == ' ') { Help.error(); return; }
 
-	Help->GetWriter();
+	Help.GetWriter();
 	cin.getline(chFWriter, SIZE, '\n');
 
 	//오류
-	if (chFWriter[0] == ' ') { Help->error(); return; }
+	if (chFWriter[0] == ' ') { Help.error(); return; }
 
-	Help->GetYear();
+	Help.GetYear();
 	cin >> nFYear;
 	if (nFYear >= 0 && nFYear <= 9999)
 	{
@@ -85,30 +85,33 @@ void File::insertbook()
 	}
 
 	//오류
-	else { Help->error(); return; }
+	else { Help.error(); return; }
 
 	//추가하기
-	Link* newNode = new Link();
-
+	SingletonClass* newNode = new SingletonClass();
+	SingletonClass* curNode = NULL;
+	curNode = testhead->next;
 	strcpy(newNode->chInformation, chInformationBuffer);
 
-	if (Head->next == NULL)
+	if (testhead->next == NULL)
 	{
-		Head->next = newNode;
+		testhead->next = newNode;
 	}
 	else
 	{
-		Tail->next = newNode;
+		while (curNode != NULL)
+		{
+			if (curNode->next == NULL)
+			{
+				curNode->next = newNode;
+				break;
+			}
+			curNode = curNode->next;
+		}
 	}
 	newNode->next = NULL;
-	Tail = newNode;
 
-	// 연결리스트를 파일에 뒤집어 씌우기
-	linkedlistTofile(Filetxt);
-
-	//회수하기
-	returnNode();
-	Help->CompleteInsert();
+	Help.CompleteInsert();
 }
 
 void File::deletebook()
@@ -117,63 +120,66 @@ void File::deletebook()
 	int nReturnIndex = 0;
 
 	//연결리스트 만들기
-	nReturnIndex = makeLinkedList(Head, Filetxt);
+	SingletonClass* testhead = SingletonClass::gethead();
 
 	//정보 입력
-	Help->GetName();
+	Help.GetName();
 	getchar();
 	cin.getline(chFName, SIZE, '\n');
 
 	//오류
-	if (chFName[0] == ' ') { Help->error(); return; }
+	if (chFName[0] == ' ') { Help.error(); return; }
 
-	Help->GetWriter();
+	Help.GetWriter();
 	cin.getline(chFWriter, SIZE, '\n');
 
 	//오류
-	if (chFWriter[0] == ' ') { Help->error(); return; }
+	if (chFWriter[0] == ' ') { Help.error(); return; }
 
-	Help->GetYear();
+	Help.GetYear();
 	cin >> nFYear;
 	if (nFYear >= 0 && nFYear <= 9999)
 	{
 		sprintf(chInformationBuffer, "%s / %s / %d\n", chFName, chFWriter, nFYear);
 	}
 	//오류
-	else { Help->error(); return; }
+	else { Help.error(); return; }
 
 	//도서가 없는 경우
 	int nGetCount = 0;
-	Filetxt = fopen("Book.txt", "r");
+	SingletonClass* curNode = NULL;
+	curNode = testhead->next;
 
-	while (fgets(chBuffer, F_SIZE, Filetxt)) // 파일의 맨 끝까지 갈 때 까지 진행
+	while (curNode != NULL) // 연결리스트의 끝까지 갈때 까지 진행
 	{
-		if (strstr(chInformationBuffer, chBuffer) != NULL)
+		if (strstr(chInformationBuffer, curNode->chInformation) != NULL)
 		{
 			nGetCount++;
 		}
 
-		else if (strstr(chInformationBuffer, chBuffer) == NULL)
+		else if (strstr(chInformationBuffer, curNode->chInformation) == NULL)
 		{
+			curNode = curNode->next;
 			continue;//계속 0으로 진행
 		}
+		curNode = curNode->next;
 	}
 
 	if (nGetCount == 0)
 	{
-		Help->NoBook();
+		Help.NoBook();
 		return;
 	}
 
 	// 특정 노드 삭제하기
-	Link* delNode = new Link();
-	delNode = Head->next;
-	Link* befNode = Head;
-	Link* nextNode;
+	SingletonClass* delNode = new SingletonClass();
+	delNode = testhead->next;
+	SingletonClass* befNode = testhead;
+	SingletonClass* nextNode;
 	nextNode = delNode->next;
 
 	int nIndex = 0; // 처음을 표현
-
+	
 	while (delNode != NULL) // 노드가 NULL 일 때 까지
 	{
 		if (strstr(delNode->chInformation, chInformationBuffer) != NULL) // 노드안에 있는 chInformation 안에 아까 입력한 chBuffer가 있을 때
@@ -184,15 +190,8 @@ void File::deletebook()
 				{
 					delete delNode;
 
-					Head->next = NULL;
-					Tail = Head;
-
-					//연결리스트 텍스트 파일에 뒤집어 씌우기
-					linkedlistTofile(Filetxt);
-
-					//회수하기 => 함수화
-					returnNode();
-					Help->CompleteDelete();
+					testhead->next = NULL;
+					Help.CompleteDelete();
 					return;
 				}
 
@@ -200,14 +199,8 @@ void File::deletebook()
 				{
 					befNode->next = NULL;
 					delete delNode;
-					Tail = befNode;
 
-					//연결리스트 텍스트 파일에 뒤집어 씌우기
-					linkedlistTofile(Filetxt);
-
-					//회수하기
-					returnNode();
-					Help->CompleteDelete();
+					Help.CompleteDelete();
 					return;
 				}
 			}
@@ -215,15 +208,10 @@ void File::deletebook()
 			{
 				if (nIndex == 0) // 처음 일 때
 				{
-					Head->next = nextNode;
+					testhead->next = nextNode;
 					delete delNode;
 
-					//연결리스트 텍스트 파일에 뒤집어 씌우기
-					linkedlistTofile(Filetxt);
-
-					//회수하기
-					returnNode();
-					Help->CompleteDelete();
+					Help.CompleteDelete();
 					return;
 				}
 
@@ -232,12 +220,7 @@ void File::deletebook()
 					befNode->next = nextNode;
 					delete delNode;
 
-					//연결리스트 텍스트 파일에 뒤집어 씌우기
-					linkedlistTofile(Filetxt);
-
-					//회수하기
-					returnNode();
-					Help->CompleteDelete();
+					Help.CompleteDelete();
 					return;
 				}
 			}
@@ -254,75 +237,75 @@ void File::searchbook()
 {
 	system("cls");
 	char chBookInformation[SIZE] = "\0";
-	char chPrintInformation[F_SIZE] = "\0";
+	char chPrintInformation[F_SIZE] = "\0"; 
 	char chBuffer[F_SIZE] = "\0";
 	int nPrintCount = 1;
 
-	Help->GetInformation();
+	Help.GetInformation();
 	getchar();
 	cin.getline(chBookInformation, SIZE, '\n');
 
 	//오류
-	if (chBookInformation[0] == ' ') { Help->error(); return; }
+	if (chBookInformation[0] == ' ') { Help.error(); return; }
+
+
+	//연결리스트 만들기
+	SingletonClass* testhead = SingletonClass::gethead();
 
 	//도서가 없는 경우
 	int nGetCount = 0;
-	Filetxt = fopen("Book.txt", "r");
+	SingletonClass* curNode = NULL;
+	curNode = testhead->next;
 
-	while (fgets(chBuffer, F_SIZE, Filetxt)) // 파일의 맨 끝까지 갈 때 까지 진행
+	while (curNode != NULL) // 연결리스트의 끝까지 갈때 까지 진행
 	{
-		if (strstr(chBuffer, chBookInformation) != NULL)
+		if (strstr(curNode->chInformation, chBookInformation) != NULL)
 		{
 			nGetCount++;
 		}
 
-
-		else if (strstr(chBuffer, chBookInformation) == NULL)
+		else if (strstr(curNode->chInformation, chBookInformation) == NULL)
 		{
+			curNode = curNode->next;
 			continue;//계속 0으로 진행
 		}
+		curNode = curNode->next;
 	}
 
 	if (nGetCount == 0)
 	{
-		Help->NoBook();
-		fclose(Filetxt);
+		Help.NoBook();
 		return;
 	}
-	fclose(Filetxt);
 
 	//특정 도서 출력
-	Filetxt = fopen("Book.txt", "r");
-	while (fgets(chPrintInformation, F_SIZE, Filetxt))
+	curNode = testhead->next;
+	Help.Information();
+	while (curNode != NULL)
 	{
-		if (strstr(chPrintInformation, chBookInformation) != NULL)
+		if (strstr(curNode->chInformation, chBookInformation) != NULL)
 		{
-			cout << "<" << nPrintCount << "> " << chPrintInformation << endl;
+			cout << "<" << nPrintCount << "> " << curNode->chInformation << endl;
 			nPrintCount++;
 		}
+		curNode = curNode->next;
 	}
-
-	fclose(Filetxt);
 	system("pause");
 }
 
-void File::initializeindex()
+void File::savefile()
 {
-	system("cls");
+	SingletonClass* testhead = SingletonClass::gethead();
+	SingletonClass* curNode = NULL;
+	curNode = testhead->next;
+	FILE* Filetxt = NULL;
+	Filetxt = fopen("Book.txt", "w");
 
-	char chinitialize[10] = {};
-	Help->HowInitialize();
-	cin >> chinitialize;
-
-	if (chinitialize[0] == 'y' || chinitialize[0] == 'Y')
+	while (curNode != NULL)
 	{
-		Filetxt = fopen("Book.txt", "w");
-		fclose(Filetxt);
-
-		Help->InitializeComplete();
-		return;
+		fprintf(Filetxt, "%s", curNode->chInformation);
+		curNode = curNode->next;
 	}
-	//오류
-	else { Help->error(); return; }
-}
 
+	Help.saveComplete();
+}
